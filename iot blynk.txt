@@ -1,0 +1,97 @@
+
+#include <ESP8266WiFi.h>
+
+#define BLYNK_PRINT Serial    
+#include <BlynkSimpleEsp8266.h>
+char auth[] = "87621b22a87d4457ab52610590977ba0";
+
+/* WiFi credentials */
+char ssid[] = "canhack";
+char pass[] = "qwertY123@";
+
+/* HC-SR501 Motion Detector */
+#define ledPin D7 
+#define pirPin A0 // Input for HC-S501
+int pirValue; // Place to store read PIR Value
+int moisture_pin=A3;
+int output;
+
+void setup()
+{
+  Serial.begin(115200);
+  delay(10);
+  Blynk.begin(auth, ssid, pass);
+  pinMode(pirPin, INPUT);
+  digitalWrite(ledPin, LOW);
+}
+
+void loop()
+{
+  unsigned int analogvalueflame;
+   analogvalueflame=analogRead(A2);
+   output=analogRead(moisture_pin); 
+   a=100-(output/10.0);
+
+  getPirValue();
+  getmoisture(a);
+  getflame(analogflamevalue);
+  Blynk.run();
+}
+
+/*****************
+ * Get PIR data
+ ******************/
+void getPirValue(void)
+{
+  pirValue = analogRead(pirPin);
+  Serial.println(pirValue);
+delay(1000);
+  
+  if (pirValue>=200) 
+  { 
+    Serial.println("==> Motion detected");
+    
+    Blynk.notify("T==> Motion detected");  
+  }
+  
+  
+  digitalWrite(ledPin, pirValue);
+}
+
+
+//************moisture*******************
+
+void  getmoisture(int a)
+{
+   if(a<=10)
+{
+Serial.println("Soil Moisture is LOW");
+  Serial.println("PUMP is ON");
+ Blynk.notify("Soil Moisture is LOW");  
+ 
+  digitalWrite(pump1,LOW);
+  digitalWrite (pump2,HIGH);
+  delay(4000);
+  }
+ }
+
+//************flame*******************
+
+ void getflame(int analogvalueflame)
+ {
+  if(analogvalueflame<=50)
+{
+Serial.println("ALERT!!!");
+Serial.println("FIRE in the field");
+Blynk.notify("ALERT!!!   FIRE in the field");  
+ 
+Serial.println("PUMP is ON");
+digitalWrite(led,HIGH);
+digitalWrite(ledpin,LOW);
+digitalWrite(spk,HIGH);
+digitalWrite(pumpa,LOW);
+digitalWrite (pumpb,HIGH);
+delay(1000);
+
+}
+}
